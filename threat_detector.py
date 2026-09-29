@@ -7,7 +7,7 @@ logs = boto3.client('logs', region_name='eu-west-2')
 sns = boto3.client('sns', region_name='eu-west-2')
 
 # The log group we created in CloudTrail setup
-LOG_GROUP = '/aws/cloudtrail/security'
+LOG_GROUP = '/aws/cloudtrail/security-v2'
 
 # How far back to look for suspicious activity (in hours)
 LOOKBACK_HOURS = 24
