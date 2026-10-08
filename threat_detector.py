@@ -148,7 +148,50 @@ def generate_report(findings):
     
     print(f"\nFull report saved to: {filename}")
 
-def generate_html_report(findings):
+def get_ai_analysis(findings):
+    # Use Bedrock to analyse findings and give threat context
+    if not findings:
+        return "No suspicious activity detected - nothing to analyse."
+    
+    bedrock = boto3.client('bedrock-runtime', region_name='eu-west-2')
+    
+    # Build summary of findings for the model
+    findings_summary = []
+    for f in findings:
+        findings_summary.append(
+            f"[{f['Severity']}] {f['EventName']} by {f['User']} from {f['SourceIP']} at {f['Time']}"
+        )
+    
+    prompt = f"""You are a cloud security analyst reviewing AWS CloudTrail threat detection findings.
+
+These suspicious events were detected in the last 24 hours:
+
+{chr(10).join(findings_summary)}
+
+Provide:
+1. A brief threat assessment of what these findings indicate
+2. Whether this looks like normal admin activity or a genuine threat
+3. Specific recommended actions in priority order
+
+Be concise and direct."""
+
+    response = bedrock.invoke_model(
+        modelId='eu.anthropic.claude-haiku-4-5-20251001-v1:0',
+        body=json.dumps({
+            'anthropic_version': 'bedrock-2023-05-31',
+            'max_tokens': 1000,
+            'messages': [{'role': 'user', 'content': prompt}]
+        })
+    )
+    
+    import re
+    import markdown
+    result = json.loads(response['body'].read())
+    clean_text = re.sub(r'[^\x00-\x7F]+', '', result['content'][0]['text'])
+    return markdown.markdown(clean_text)
+
+
+def generate_html_report(findings, ai_analysis=""):
     # HTML version of the report - easier to read than JSON
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     filename = f"threat_report_{timestamp}.html"
@@ -194,6 +237,14 @@ def generate_html_report(findings):
     else:
         html += "<p>No suspicious activity detected in the last 24 hours</p>"
 
+    if ai_analysis:
+        html += f"""
+    <div style="background:#eaf4fb;border-left:4px solid #2874a6;padding:15px;margin-top:20px;">
+        <h2>AI Threat Analysis</h2>
+        <div>{ai_analysis}</div>
+    </div>
+"""
+
     html += "</body></html>"
 
     with open(filename, 'w') as f:
@@ -209,5 +260,8 @@ if __name__ == "__main__":
     print(f"Retrieved {len(events)} log events")
     
     findings = analyse_events(events)
+    ai_analysis = get_ai_analysis(findings)
+    print("\n=== AI Threat Analysis ===")
+    print(ai_analysis)
     generate_report(findings)
-    generate_html_report(findings)
+    generate_html_report(findings, ai_analysis)
