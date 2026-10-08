@@ -1,0 +1,117 @@
+
+<html>
+<head>
+    <title>Threat Detection Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #232f3e; }
+        .summary { background: #f0f0f0; padding: 15px; border-radius: 5px; }
+        .finding { border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 5px; }
+        .CRITICAL { border-left: 5px solid #d13212; }
+        .HIGH { border-left: 5px solid #ff9900; }
+        .MEDIUM { border-left: 5px solid #f0b400; }
+        .severity-CRITICAL { color: #d13212; font-weight: bold; }
+        .severity-HIGH { color: #ff9900; font-weight: bold; }
+        .severity-MEDIUM { color: #f0b400; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Threat Detection Report</h1>
+    <div class="summary">
+        <p>Scan time: 2026-10-08 18:36:06</p>
+        <p>Period covered: last 24 hours</p>
+        <p>Total findings: 5</p>
+    </div>
+
+    <div class="finding CRITICAL">
+        <span class="severity-CRITICAL">[CRITICAL]</span>
+        <strong>ROOT_ACCOUNT_USED: GetLogEvents</strong>
+        <p>User: root</p>
+        <p>Source IP: 103.100.225.71</p>
+        <p>Time: 2026-10-08T08:30:32Z</p>
+    </div>
+
+    <div class="finding CRITICAL">
+        <span class="severity-CRITICAL">[CRITICAL]</span>
+        <strong>ROOT_ACCOUNT_USED: GetLogEvents</strong>
+        <p>User: root</p>
+        <p>Source IP: 103.100.225.71</p>
+        <p>Time: 2026-10-08T08:30:34Z</p>
+    </div>
+
+    <div class="finding CRITICAL">
+        <span class="severity-CRITICAL">[CRITICAL]</span>
+        <strong>ROOT_ACCOUNT_USED: GetLogEvents</strong>
+        <p>User: root</p>
+        <p>Source IP: 103.100.225.71</p>
+        <p>Time: 2026-10-08T08:30:35Z</p>
+    </div>
+
+    <div class="finding CRITICAL">
+        <span class="severity-CRITICAL">[CRITICAL]</span>
+        <strong>ROOT_ACCOUNT_USED: GetLogEvents</strong>
+        <p>User: root</p>
+        <p>Source IP: 103.100.225.71</p>
+        <p>Time: 2026-10-08T08:30:36Z</p>
+    </div>
+
+    <div class="finding CRITICAL">
+        <span class="severity-CRITICAL">[CRITICAL]</span>
+        <strong>ROOT_ACCOUNT_USED: DescribeLogStreams</strong>
+        <p>User: root</p>
+        <p>Source IP: 103.100.225.71</p>
+        <p>Time: 2026-10-08T08:30:31Z</p>
+    </div>
+
+    <div style="background:#eaf4fb;border-left:4px solid #2874a6;padding:15px;margin-top:20px;">
+        <h2>AI Threat Analysis</h2>
+        <div><h1>Threat Assessment</h1>
+<h2>Threat Level: <strong>CRITICAL</strong></h2>
+<p><strong>What This Indicates:</strong>
+- Root account credentials compromised or exposed
+- Automated reconnaissance of CloudWatch Logs (likely data exfiltration preparation)
+- Attack originating from external IP (103.100.225.71 - appears to be outside your organization)
+- Rapid-fire API calls suggest scripted/automated attack, not legitimate admin work</p>
+<h2>Normal Activity or Genuine Threat?</h2>
+<p><strong>GENUINE THREAT</strong>  Strong indicators:
+- Root account should never be used for routine operations
+- Multiple identical calls within seconds (08:30:31-36) = automated scanning pattern
+- External IP access to root credentials is extremely abnormal
+- GetLogEvents + DescribeLogStreams sequence = reconnaissance for sensitive data</p>
+<hr />
+<h2>Recommended Actions (Priority Order)</h2>
+<ol>
+<li><strong>IMMEDIATE (Next 15 min)</strong></li>
+<li>Disable root account access keys if active</li>
+<li>Revoke root user sessions</li>
+<li>
+<p>Enable root account MFA if not already enabled</p>
+</li>
+<li>
+<p><strong>URGENT (Within 1 hour)</strong></p>
+</li>
+<li>Rotate all IAM user credentials</li>
+<li>Review CloudTrail logs for past 7 days from this IP and root account</li>
+<li>Check for unauthorized IAM policy changes or user creation</li>
+<li>
+<p>Block IP 103.100.225.71 at WAF/security group level</p>
+</li>
+<li>
+<p><strong>HIGH (Within 4 hours)</strong></p>
+</li>
+<li>Enable GuardDuty and Security Hub for ongoing threat detection</li>
+<li>Audit all logs accessed during this timeframe for sensitive data exposure</li>
+<li>Implement root account lock policy (MFA + IP restrictions)</li>
+<li>
+<p>Review S3 buckets, secrets, and databases for unauthorized access</p>
+</li>
+<li>
+<p><strong>FOLLOW-UP (Within 24 hours)</strong></p>
+</li>
+<li>Conduct full forensic analysis of root account activity</li>
+<li>File incident ticket and notify leadership</li>
+<li>Consider AWS support case for additional investigation</li>
+</ol>
+<p><strong>Critical:</strong> Do not delay on steps 1-2.</p></div>
+    </div>
+</body></html>
