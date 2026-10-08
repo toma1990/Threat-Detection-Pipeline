@@ -148,6 +148,59 @@ def generate_report(findings):
     
     print(f"\nFull report saved to: {filename}")
 
+def generate_html_report(findings):
+    # HTML version of the report - easier to read than JSON
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f"threat_report_{timestamp}.html"
+    
+    html = f"""
+<html>
+<head>
+    <title>Threat Detection Report</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; margin: 40px; }}
+        h1 {{ color: #232f3e; }}
+        .summary {{ background: #f0f0f0; padding: 15px; border-radius: 5px; }}
+        .finding {{ border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 5px; }}
+        .CRITICAL {{ border-left: 5px solid #d13212; }}
+        .HIGH {{ border-left: 5px solid #ff9900; }}
+        .MEDIUM {{ border-left: 5px solid #f0b400; }}
+        .severity-CRITICAL {{ color: #d13212; font-weight: bold; }}
+        .severity-HIGH {{ color: #ff9900; font-weight: bold; }}
+        .severity-MEDIUM {{ color: #f0b400; font-weight: bold; }}
+    </style>
+</head>
+<body>
+    <h1>Threat Detection Report</h1>
+    <div class="summary">
+        <p>Scan time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+        <p>Period covered: last {LOOKBACK_HOURS} hours</p>
+        <p>Total findings: {len(findings)}</p>
+    </div>
+"""
+
+    if findings:
+        for finding in findings:
+            severity = finding['Severity']
+            html += f"""
+    <div class="finding {severity}">
+        <span class="severity-{severity}">[{severity}]</span>
+        <strong>{finding['EventName']}</strong>
+        <p>User: {finding['User']}</p>
+        <p>Source IP: {finding['SourceIP']}</p>
+        <p>Time: {finding['Time']}</p>
+    </div>
+"""
+    else:
+        html += "<p>No suspicious activity detected in the last 24 hours</p>"
+
+    html += "</body></html>"
+
+    with open(filename, 'w') as f:
+        f.write(html)
+
+    print(f"HTML report saved to: {filename}")
+
 if __name__ == "__main__":
     print("Starting threat detection scan...")
     print(f"Checking CloudTrail logs for last {LOOKBACK_HOURS} hours\n")
@@ -157,3 +210,4 @@ if __name__ == "__main__":
     
     findings = analyse_events(events)
     generate_report(findings)
+    generate_html_report(findings)
