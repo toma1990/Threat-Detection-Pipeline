@@ -1,6 +1,9 @@
 import boto3
 import json
+import os
 from datetime import datetime, timezone, timedelta
+
+os.makedirs('reports', exist_ok=True)
 
 # Connect to CloudWatch Logs where CloudTrail sends events
 logs = boto3.client('logs', region_name='eu-west-2')
@@ -119,7 +122,7 @@ def get_severity(event_name):
 def generate_report(findings):
     # Save findings to JSON with timestamp
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    filename = f"threat_report_{timestamp}.json"
+    filename = f"reports/threat_report_{timestamp}.json"
     
     report = {
         'ScanTime': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
@@ -194,7 +197,7 @@ Be concise and direct."""
 def generate_html_report(findings, ai_analysis=""):
     # HTML version of the report - easier to read than JSON
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    filename = f"threat_report_{timestamp}.html"
+    filename = f"reports/threat_report_{timestamp}.html"
     
     html = f"""
 <html>
